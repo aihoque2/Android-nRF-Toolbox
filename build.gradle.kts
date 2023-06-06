@@ -48,3 +48,21 @@ plugins {
     alias(libs.plugins.google.services) apply false
     alias(libs.plugins.firebase.crashlytics) apply false
 }
+
+subprojects {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        kotlinOptions {
+            println("AAA")
+            if (project.findProperty("composeCompilerReports") == "true") {
+                println("BBB")
+                freeCompilerArgs = freeCompilerArgs + "-P" + ("plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" + project.buildDir.absolutePath + "/compose_compiler")
+
+            }
+            if (project.findProperty("composeCompilerReports") == "true") {
+                println("CCC")
+                freeCompilerArgs = freeCompilerArgs + "-P" + ("plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" +
+                            project.buildDir.absolutePath + "/compose_compiler")
+            }
+        }
+    }
+}
