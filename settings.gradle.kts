@@ -82,3 +82,4 @@ if (file("../Android-Common-Libraries").exists()) {
 if (file("../Kotlin-BLE-Library").exists()) {
     includeBuild("../Kotlin-BLE-Library")
 }
+include(":feature_profile")

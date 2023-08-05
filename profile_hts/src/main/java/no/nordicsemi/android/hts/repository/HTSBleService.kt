@@ -29,10 +29,37 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package no.nordicsemi.android.hts.view
+package no.nordicsemi.android.hts.repository
 
-enum class TemperatureUnit {
-    CELSIUS,
-    FAHRENHEIT,
-    KELVIN
+import android.annotation.SuppressLint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
+import no.nordicsemi.android.hts.viewmodel.HTSRepository
+import no.nordicsemi.android.kotlin.ble.client.main.service.ClientBleGattServices
+import no.nordicsemi.android.kotlin.ble.profile.hts.HTSDataParser
+import java.util.*
+import javax.inject.Inject
+
+val HTS_SERVICE_UUID: UUID = UUID.fromString("00001809-0000-1000-8000-00805f9b34fb")
+private val HTS_MEASUREMENT_CHARACTERISTIC_UUID = UUID.fromString("00002A1C-0000-1000-8000-00805f9b34fb")
+
+@SuppressLint("MissingPermission")
+class HTSBleService @Inject constructor(
+    private val repository: HTSRepository,
+    private val scope: CoroutineScope
+) {
+
+    suspend fun configureGatt(services: ClientBleGattServices) {
+        val htsService = services.findService(HTS_SERVICE_UUID)!!
+        val htsMeasurementCharacteristic = htsService.findCharacteristic(HTS_MEASUREMENT_CHARACTERISTIC_UUID)!!
+
+        htsMeasurementCharacteristic.getNotifications()
+            .mapNotNull { HTSDataParser.parse(it) }
+            .onEach { repository.onHTSDataChanged(it) }
+            .catch { it.printStackTrace() }
+            .launchIn(scope)
+    }
 }

@@ -48,4 +48,6 @@ plugins {
     alias(libs.plugins.nordic.feature) apply false
     alias(libs.plugins.google.services) apply false
     alias(libs.plugins.firebase.crashlytics) apply false
+    id("com.android.library") version "8.1.0" apply false
+    id("org.jetbrains.kotlin.android") version "1.9.0" apply false
 }

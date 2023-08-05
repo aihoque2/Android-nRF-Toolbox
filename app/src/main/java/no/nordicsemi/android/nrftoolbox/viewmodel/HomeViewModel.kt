@@ -48,7 +48,6 @@ import no.nordicsemi.android.common.navigation.DestinationId
 import no.nordicsemi.android.common.navigation.Navigator
 import no.nordicsemi.android.csc.repository.CSCRepository
 import no.nordicsemi.android.hrs.service.HRSRepository
-import no.nordicsemi.android.hts.repository.HTSRepository
 import no.nordicsemi.android.nrftoolbox.repository.ActivitySignals
 import no.nordicsemi.android.nrftoolbox.view.HomeViewState
 import no.nordicsemi.android.prx.repository.PRXRepository

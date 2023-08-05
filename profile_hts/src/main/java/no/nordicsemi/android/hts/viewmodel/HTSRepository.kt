@@ -29,26 +29,21 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package no.nordicsemi.android.hts.repository
+package no.nordicsemi.android.hts.viewmodel
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import no.nordicsemi.android.common.core.simpleSharedFlow
+import no.nordicsemi.android.analytics.AppAnalytics
 import no.nordicsemi.android.common.logger.BleLoggerAndLauncher
-import no.nordicsemi.android.common.logger.DefaultBleLogger
+import no.nordicsemi.android.common.navigation.Navigator
 import no.nordicsemi.android.hts.data.HTSServiceData
+import no.nordicsemi.android.hts.view.HTSScreenViewEvent
+import no.nordicsemi.android.hts.view.OnTemperatureUnitSelected
 import no.nordicsemi.android.hts.view.TemperatureUnit
-import no.nordicsemi.android.kotlin.ble.core.ServerDevice
-import no.nordicsemi.android.kotlin.ble.core.data.GattConnectionState
-import no.nordicsemi.android.kotlin.ble.core.data.GattConnectionStateWithStatus
 import no.nordicsemi.android.kotlin.ble.profile.hts.data.HTSData
-import no.nordicsemi.android.service.DisconnectAndStopEvent
-import no.nordicsemi.android.service.ServiceManager
-import no.nordicsemi.android.ui.view.StringConst
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -56,77 +51,43 @@ import javax.inject.Singleton
 class HTSRepository @Inject constructor(
     @ApplicationContext
     private val context: Context,
-    private val serviceManager: ServiceManager,
-    private val stringConst: StringConst
+    private val navigationManager: Navigator,
+    private val analytics: AppAnalytics,
+    private val scope: CoroutineScope
 ) {
     private var logger: BleLoggerAndLauncher? = null
 
     private val _data = MutableStateFlow(HTSServiceData())
-    internal val data = _data.asStateFlow()
+    val data = _data.asStateFlow()
 
-    private val _stopEvent = simpleSharedFlow<DisconnectAndStopEvent>()
-    internal val stopEvent = _stopEvent.asSharedFlow()
+    init {
 
-    val isRunning = data.map { it.connectionState?.state == GattConnectionState.STATE_CONNECTED }
-
-    private var isOnScreen = false
-    private var isServiceRunning = false
-
-    fun setOnScreen(isOnScreen: Boolean) {
-        this.isOnScreen = isOnScreen
-
-        if (shouldClean()) clean()
+//        repository.data.onEach {
+//            if (it.connectionState?.state == GattConnectionState.STATE_CONNECTED) {
+//                analytics.logEvent(ProfileConnectedEvent(Profile.HTS))
+//            }
+//        }.launchIn(scope)
     }
 
-    fun setServiceRunning(serviceRunning: Boolean) {
-        this.isServiceRunning = serviceRunning
-
-        if (shouldClean()) clean()
+    fun onEvent(event: HTSScreenViewEvent) {
+        when (event) {
+            is OnTemperatureUnitSelected -> setTemperatureUnit(event.value)
+        }
     }
 
-    private fun shouldClean() = !isOnScreen && !isServiceRunning
-
-    fun launch(device: ServerDevice) {
-        _data.value = _data.value.copy(deviceName = device.name)
-        logger = DefaultBleLogger.create(context, stringConst.APP_NAME, "HTS", device.address)
-        serviceManager.startService(HTSService::class.java, device)
-    }
-
-    internal fun setTemperatureUnit(temperatureUnit: TemperatureUnit) {
+    private fun setTemperatureUnit(temperatureUnit: TemperatureUnit) {
         _data.value = _data.value.copy(temperatureUnit = temperatureUnit)
-    }
-
-    fun onConnectionStateChanged(connectionState: GattConnectionStateWithStatus?) {
-        _data.value = _data.value.copy(connectionState = connectionState)
     }
 
     fun onHTSDataChanged(data: HTSData) {
         _data.value = _data.value.copy(data = data)
     }
 
-    fun onBatteryLevelChanged(batteryLevel: Int) {
-        _data.value = _data.value.copy(batteryLevel = batteryLevel)
-    }
-
-    fun openLogger() {
-        logger?.launch()
-    }
-
     fun log(priority: Int, message: String) {
         logger?.log(priority, message)
     }
 
-    fun disconnect() {
-        _stopEvent.tryEmit(DisconnectAndStopEvent())
-    }
-
-    fun onMissingServices() {
-        _data.value = _data.value.copy(missingServices = true)
-        _stopEvent.tryEmit(DisconnectAndStopEvent())
-    }
-
-    private fun clean() {
-        logger = null
-        _data.value = HTSServiceData()
+    private fun disconnect() {
+        navigationManager.navigateUp()
     }
 }

@@ -35,6 +35,7 @@ import android.os.ParcelUuid
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -86,8 +87,9 @@ internal class UARTViewModel @Inject constructor(
     private val navigationManager: Navigator,
     private val dataSource: UARTPersistentDataSource,
     private val analytics: AppAnalytics,
-    private val loggerFactory: NordicLoggerFactory
-) : ViewModel() {
+    private val loggerFactory: NordicLoggerFactory,
+    private val scope: CoroutineScope
+) {
 
     private val _state = MutableStateFlow(UARTViewState())
     val state = _state.asStateFlow()
@@ -95,7 +97,7 @@ internal class UARTViewModel @Inject constructor(
     init {
         repository.setOnScreen(true)
 
-        viewModelScope.launch {
+        scope.launch {
             if (repository.isRunning.firstOrNull() == false) {
                 requestBluetoothDevice()
             }
@@ -107,17 +109,17 @@ internal class UARTViewModel @Inject constructor(
             if (it.connectionState?.state == GattConnectionState.STATE_CONNECTED) {
                 analytics.logEvent(ProfileConnectedEvent(Profile.UART))
             }
-        }.launchIn(viewModelScope)
+        }.launchIn(scope)
 
         dataSource.getConfigurations().onEach {
             _state.value = _state.value.copy(configurations = it)
-        }.launchIn(viewModelScope)
+        }.launchIn(scope)
 
         repository.lastConfigurationName.onEach {
             it?.let {
                 _state.value = _state.value.copy(selectedConfigurationName = it)
             }
-        }.launchIn(viewModelScope)
+        }.launchIn(scope)
     }
 
     private fun requestBluetoothDevice() {
@@ -125,7 +127,7 @@ internal class UARTViewModel @Inject constructor(
 
         navigationManager.resultFrom(ScannerDestinationId)
             .onEach { handleResult(it) }
-            .launchIn(viewModelScope)
+            .launchIn(scope)
     }
 
     internal fun handleResult(result: NavigationResult<ServerDevice>) {
@@ -179,7 +181,7 @@ internal class UARTViewModel @Inject constructor(
     }
 
     private fun onAddConfiguration(event: OnAddConfiguration) {
-        viewModelScope.launch(Dispatchers.IO) {
+        scope.launch(Dispatchers.IO) {
             dataSource.saveConfiguration(UARTConfiguration(null, event.name))
             _state.value = _state.value.copy(selectedConfigurationName = event.name)
         }
@@ -201,13 +203,13 @@ internal class UARTViewModel @Inject constructor(
     }
 
     private fun saveLastConfigurationName(name: String) {
-        viewModelScope.launch {
+        scope.launch {
             repository.saveConfigurationName(name)
         }
     }
 
     private fun addNewMacro(macro: UARTMacro) {
-        viewModelScope.launch(Dispatchers.IO) {
+        scope.launch(Dispatchers.IO) {
             _state.value.selectedConfiguration?.let {
                 val macros = it.macros.toMutableList().apply {
                     set(_state.value.editedPosition!!, macro)
@@ -220,7 +222,7 @@ internal class UARTViewModel @Inject constructor(
     }
 
     private fun deleteConfiguration() {
-        viewModelScope.launch(Dispatchers.IO) {
+        scope.launch(Dispatchers.IO) {
             _state.value.selectedConfiguration?.let {
                 dataSource.deleteConfiguration(it)
             }
@@ -228,7 +230,7 @@ internal class UARTViewModel @Inject constructor(
     }
 
     private fun deleteMacro() {
-        viewModelScope.launch(Dispatchers.IO) {
+        scope.launch(Dispatchers.IO) {
             _state.value.selectedConfiguration?.let {
                 val macros = it.macros.toMutableList().apply {
                     set(_state.value.editedPosition!!, null)

@@ -35,8 +35,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,13 +44,12 @@ import androidx.compose.ui.unit.dp
 import no.nordicsemi.android.common.theme.view.RadioButtonGroup
 import no.nordicsemi.android.hts.R
 import no.nordicsemi.android.hts.data.HTSServiceData
-import no.nordicsemi.android.ui.view.BatteryLevelView
 import no.nordicsemi.android.ui.view.KeyValueField
 import no.nordicsemi.android.ui.view.ScreenSection
 import no.nordicsemi.android.ui.view.SectionTitle
 
 @Composable
-internal fun HTSContentView(state: HTSServiceData, onEvent: (HTSScreenViewEvent) -> Unit) {
+fun HTSContentView(state: HTSServiceData, onEvent: (HTSScreenViewEvent) -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -78,20 +75,6 @@ internal fun HTSContentView(state: HTSServiceData, onEvent: (HTSScreenViewEvent)
                 stringResource(id = R.string.hts_temperature),
                 displayTemperature(state.data.temperature, state.temperatureUnit)
             )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        state.batteryLevel?.let {
-            BatteryLevelView(it)
-
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        Button(
-            onClick = { onEvent(DisconnectEvent) }
-        ) {
-            Text(text = stringResource(id = R.string.disconnect))
         }
     }
 }

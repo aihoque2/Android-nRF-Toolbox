@@ -32,22 +32,9 @@
 package no.nordicsemi.android.hts.data
 
 import no.nordicsemi.android.hts.view.TemperatureUnit
-import no.nordicsemi.android.kotlin.ble.core.data.BleGattConnectionStatus
-import no.nordicsemi.android.kotlin.ble.core.data.GattConnectionStateWithStatus
 import no.nordicsemi.android.kotlin.ble.profile.hts.data.HTSData
 
-internal data class HTSServiceData(
+data class HTSServiceData(
     val data: HTSData = HTSData(),
-    val batteryLevel: Int? = null,
-    val connectionState: GattConnectionStateWithStatus? = null,
     val temperatureUnit: TemperatureUnit = TemperatureUnit.CELSIUS,
-    val deviceName: String? = null,
-    val missingServices: Boolean = false
-) {
-
-    val disconnectStatus = if (missingServices) {
-        BleGattConnectionStatus.NOT_SUPPORTED
-    } else {
-        connectionState?.status ?: BleGattConnectionStatus.UNKNOWN
-    }
-}
+)
