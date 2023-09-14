@@ -50,7 +50,7 @@ public class FileHelper {
 				new String[] { filePath },
 				null)) {
 			if (cursor != null && cursor.moveToFirst()) {
-				final int id = cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns._ID));
+				final int id = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID));
 				return Uri.withAppendedPath(uri, String.valueOf(id));
 			} else {
 				if (file.exists()) {

@@ -146,7 +146,7 @@ public class ScannerActivity extends Activity {
 				return;
 			}
 
-			if (checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+			if (checkSelfPermission(Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
 				requestPermissions(new String[] { Manifest.permission.BLUETOOTH}, REQUEST_BLUETOOTH_CONNECT_PERMISSION);
 				return;
 			}

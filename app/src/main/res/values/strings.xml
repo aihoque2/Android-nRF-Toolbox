@@ -66,7 +66,7 @@
 	<string name="scanner_subtitle_not_bonded">AVAILABLE DEVICES:</string>
 	<string name="scanner_permission_rationale">Since Android 6.0 Marshmallow system requires granting access to device\'s location in order to scan for Bluetooth LE devices. Bluetooth beacons may be used to determine the phone\'s and user\'s location.</string>
 
-	<string name="log" formatted="false">%1$tR:%1$tS.%1$tL</string>
+	<string name="log">%1$tR:%1$tS.%1$tL</string>
 
 	<string name="about_title">About</string>
 	<string name="about_version">\n\nVersion: %s</string>
