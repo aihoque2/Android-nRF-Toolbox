@@ -187,7 +187,8 @@
 			android:name="no.nordicsemi.android.nrftoolbox.rsc.RSCActivity"
 			android:icon="@drawable/ic_rsc_feature"
 			android:label="@string/rsc_feature_title"
-			android:launchMode="singleTask" >
+			android:launchMode="singleTask"
+			android:exported="true" >
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 
@@ -201,7 +202,8 @@
 			android:name="no.nordicsemi.android.nrftoolbox.csc.CSCActivity"
 			android:icon="@drawable/ic_csc_feature"
 			android:label="@string/csc_feature_title"
-			android:launchMode="singleTask" >
+			android:launchMode="singleTask"
+			android:exported="true" >
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 
@@ -216,7 +218,8 @@
 			android:icon="@drawable/ic_uart_feature"
 			android:label="@string/uart_feature_title"
 			android:windowSoftInputMode="adjustResize"
-			android:launchMode="singleTask" >
+			android:launchMode="singleTask"
+			android:exported="true" >
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 
@@ -226,7 +229,8 @@
 		<activity android:name="no.nordicsemi.android.nrftoolbox.cgm.CGMSActivity"
 			android:icon="@drawable/ic_cgms_feature"
 			android:label="@string/cgms_feature_title"
-			android:launchMode="singleTask">
+			android:launchMode="singleTask"
+			android:exported="true">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 
@@ -252,7 +256,8 @@
 			android:name="no.nordicsemi.android.nrftoolbox.dfu.DfuInitiatorActivity"
 			android:label="@string/dfu_service_title"
 			android:noHistory="true"
-			android:theme="@style/AppTheme.Translucent" >
+			android:theme="@style/AppTheme.Translucent"
+			android:exported="true" >
 			<intent-filter>
 				<action android:name="no.nordicsemi.android.action.DFU_UPLOAD" />
 
@@ -275,7 +280,7 @@
 		<service
 			android:name="no.nordicsemi.android.nrftoolbox.uart.UARTService"
 			android:label="@string/uart_feature_title" />
-		<service android:name=".wearable.MainWearableListenerService">
+		<service android:name=".wearable.MainWearableListenerService" android:exported="true">
 			<intent-filter>
 				<action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
 				<action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
